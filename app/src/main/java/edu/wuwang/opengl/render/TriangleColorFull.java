@@ -72,13 +72,17 @@ public class TriangleColorFull extends Shape {
 
     public TriangleColorFull(View mView) {
         super(mView);
+        //虚拟机数据复制到本地内存
         ByteBuffer bb = ByteBuffer.allocateDirect(
                 triangleCoords.length * 4);
         bb.order(ByteOrder.nativeOrder());
-
+        //转换成浮点数据
         vertexBuffer = bb.asFloatBuffer();
+        //把虚拟机数据复制到本地内存中
         vertexBuffer.put(triangleCoords);
+        //位置数据从起始位置开始读取
         vertexBuffer.position(0);
+        //虚拟机数据复制到本地内存
         ByteBuffer dd = ByteBuffer.allocateDirect(
                 color.length * 4);
         dd.order(ByteOrder.nativeOrder());

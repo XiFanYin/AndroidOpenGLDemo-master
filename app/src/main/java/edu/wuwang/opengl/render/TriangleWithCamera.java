@@ -65,15 +65,20 @@ public class TriangleWithCamera extends Shape {
 
     public TriangleWithCamera(View mView) {
         super(mView);
+        //虚拟机数据复制到本地内存
         ByteBuffer bb = ByteBuffer.allocateDirect(
                 triangleCoords.length * 4);
         bb.order(ByteOrder.nativeOrder());
-
+        //转换成浮点数据
         vertexBuffer = bb.asFloatBuffer();
+        //把虚拟机数据复制到本地内存中
         vertexBuffer.put(triangleCoords);
+        //位置数据从起始位置开始读取
         vertexBuffer.position(0);
+        //调用父类方法编译源码，传递类型为顶点
         int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER,
                 vertexShaderCode);
+        //调用父类方法编译源码，传递类型为片段
         int fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER,
                 fragmentShaderCode);
 
