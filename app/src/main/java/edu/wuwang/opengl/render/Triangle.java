@@ -1,7 +1,7 @@
 /*
  *
  * Triangle.java
- * 
+ *
  * Created by Wuwang on 2016/9/30
  */
 package edu.wuwang.opengl.render;
@@ -39,7 +39,7 @@ public class Triangle extends Shape {
 
     static final int COORDS_PER_VERTEX = 3;
     static float triangleCoords[] = {
-            0.5f,  0.5f, 0.0f, // top
+            0.5f, 0.5f, 0.0f, // top
             -0.5f, -0.5f, 0.0f, // bottom left
             0.5f, -0.5f, 0.0f  // bottom right
     };
@@ -47,29 +47,33 @@ public class Triangle extends Shape {
     private int mPositionHandle;
     private int mColorHandle;
 
-    private float[] mViewMatrix=new float[16];
 
     //顶点个数
     private final int vertexCount = triangleCoords.length / COORDS_PER_VERTEX;
     //顶点之间的偏移量
     private final int vertexStride = COORDS_PER_VERTEX * 4; // 每个顶点四个字节
 
-    private int mMatrixHandler;
+
 
     //设置颜色，依次为红绿蓝和透明通道
-    float color[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    float color[] = {1.0f, 1.0f, 1.0f, 1.0f};
 
     public Triangle(View mView) {
         super(mView);
+        //虚拟机数据复制到本地内存
         ByteBuffer bb = ByteBuffer.allocateDirect(
                 triangleCoords.length * 4);
         bb.order(ByteOrder.nativeOrder());
-
+        //转换成浮点数据
         vertexBuffer = bb.asFloatBuffer();
+        //把虚拟机数据复制到本地内存中
         vertexBuffer.put(triangleCoords);
+        //位置数据从起始位置开始读取
         vertexBuffer.position(0);
+        //调用父类方法编译源码，传递类型为顶点
         int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER,
                 vertexShaderCode);
+        //调用父类方法编译源码，传递类型为片段
         int fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER,
                 fragmentShaderCode);
 
@@ -104,6 +108,14 @@ public class Triangle extends Shape {
         //启用三角形顶点的句柄
         GLES20.glEnableVertexAttribArray(mPositionHandle);
         //准备三角形的坐标数据
+        /**
+         * 参数1：属性句柄
+         * 参数2：每个属性数据计数，三维所以这里是3
+         * 参数3：数据类型
+         * 参数4：使用整型，该参数才有意义
+         * 参数5:数据偏移量
+         * 参数6：数据地址
+         */
         GLES20.glVertexAttribPointer(mPositionHandle, COORDS_PER_VERTEX,
                 GLES20.GL_FLOAT, false,
                 vertexStride, vertexBuffer);
