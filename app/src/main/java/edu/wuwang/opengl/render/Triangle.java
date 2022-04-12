@@ -100,30 +100,33 @@ public class Triangle extends Shape {
     @Override
     public void onDrawFrame(GL10 gl) {
 
-        //将程序加入到OpenGLES2.0环境
+        //激活程序。默认是非激活状态
         GLES20.glUseProgram(mProgram);
-
-        //获取顶点着色器的vPosition成员句柄
+        //获取属性位置
         mPositionHandle = GLES20.glGetAttribLocation(mProgram, "vPosition");
-        //启用三角形顶点的句柄
-        GLES20.glEnableVertexAttribArray(mPositionHandle);
-        //准备三角形的坐标数据
+        //解释顶点数据
         /**
-         * 参数1：属性句柄
+         * 参数1：属性位置
          * 参数2：每个属性数据计数，三维所以这里是3
          * 参数3：数据类型
-         * 参数4：使用整型，该参数才有意义
-         * 参数5:数据偏移量
+         * 参数4：数据是否被标准化（-1 ，1区间）
+         * 参数5:每个定点数据的步长，说白了：属性第二次出现的地方到第一个出现的首位置有多少个字节，包前不包后
          * 参数6：数据地址
          */
         GLES20.glVertexAttribPointer(mPositionHandle, COORDS_PER_VERTEX,
                 GLES20.GL_FLOAT, false,
                 vertexStride, vertexBuffer);
+        //启用三角形顶点的句柄，默认是禁用的
+        GLES20.glEnableVertexAttribArray(mPositionHandle);
         //获取片元着色器的vColor成员的句柄
         mColorHandle = GLES20.glGetUniformLocation(mProgram, "vColor");
         //设置绘制三角形的颜色
         GLES20.glUniform4fv(mColorHandle, 1, color, 0);
-        //绘制三角形
+        /**
+         * 参数一：绘制图元类型
+         * 参数二：顶点数组的起始索引
+         * 参数三：定点个数
+         */
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, vertexCount);
         //禁止顶点数组的句柄
         GLES20.glDisableVertexAttribArray(mPositionHandle);

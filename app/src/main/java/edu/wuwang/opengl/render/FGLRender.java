@@ -36,7 +36,7 @@ public class FGLRender extends Shape {
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        //设置背景颜色
+        //设置清空屏幕所用的颜色，状态设置函数
         GLES20.glClearColor(0.5f,0.5f,0.5f,1.0f);
         Log.e("wuwang","onSurfaceCreated");
         try {
@@ -65,7 +65,7 @@ public class FGLRender extends Shape {
     @Override
     public void onDrawFrame(GL10 gl) {
         Log.e("wuwang","onDrawFrame");
-        //清空缓存
+        //清空缓存区颜色，缓冲区颜色会被填充为glClearColor设置的颜色，状态使用函数
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT|GLES20.GL_DEPTH_BUFFER_BIT);
         //调用真正的绘制
         shape.onDrawFrame(gl);
