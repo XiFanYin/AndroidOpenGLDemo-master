@@ -85,6 +85,12 @@ public class Triangle extends Shape {
         GLES20.glAttachShader(mProgram, fragmentShader);
         //连接到着色器程序
         GLES20.glLinkProgram(mProgram);
+        //着色器对象链接到程序对象以后，记得删除着色器对象,及时释放内存，C#语言不会主动像java一样垃圾回收机制
+        GLES20.glDeleteShader(vertexShader);
+        GLES20.glDeleteShader(fragmentShader);
+
+
+
     }
 
     @Override
