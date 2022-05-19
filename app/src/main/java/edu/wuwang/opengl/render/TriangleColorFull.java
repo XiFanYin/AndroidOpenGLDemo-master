@@ -145,7 +145,7 @@ public class TriangleColorFull extends Shape {
         GLES20.glEnableVertexAttribArray(mColorHandle);
         GLES20.glVertexAttribPointer(mColorHandle,4,
                 GLES20.GL_FLOAT,false,
-                0,colorBuffer);
+                16,colorBuffer);
         //绘制三角形
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, vertexCount);
         //禁止顶点数组的句柄
