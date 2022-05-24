@@ -19,6 +19,7 @@ public class VaryRender implements GLSurfaceView.Renderer {
     private Cube cube;
 
     public VaryRender(Resources res){
+        //矩阵基本变换工具类
         tools=new VaryTools();
         cube=new Cube(res);
     }
