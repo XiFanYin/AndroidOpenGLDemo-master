@@ -29,6 +29,7 @@ public class CameraActivity extends BaseActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //请求相机权限
         PermissionUtils.askPermission(this,new String[]{Manifest.permission.CAMERA,Manifest
             .permission.WRITE_EXTERNAL_STORAGE},10,initViewRunnable);
     }

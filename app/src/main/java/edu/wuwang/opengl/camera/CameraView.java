@@ -19,7 +19,7 @@ import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 
 /**
- * Description:
+ * Description:视频使用opengl去渲染
  */
 public class CameraView extends GLSurfaceView implements GLSurfaceView.Renderer {
 
