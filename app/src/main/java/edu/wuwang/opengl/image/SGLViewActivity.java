@@ -90,7 +90,9 @@ public class SGLViewActivity extends BaseActivity{
                 break;
 
         }
+        //设置是否处理一半
         mGLView.getRender().getFilter().setHalf(isHalf);
+        //手动调用渲染
         mGLView.requestRender();
         return super.onOptionsItemSelected(item);
     }

@@ -88,6 +88,7 @@ public class SGLRender implements GLSurfaceView.Renderer {
 
     @Override
     public void onDrawFrame(GL10 gl) {
+        //再次渲染，手动调用渲染
         if(refreshFlag&&width!=0&&height!=0){
             mFilter.onSurfaceCreated(gl, config);
             mFilter.onSurfaceChanged(gl,width,height);
