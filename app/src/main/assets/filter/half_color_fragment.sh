@@ -1,14 +1,21 @@
 precision mediump float;
 
+//默认传递过来的是0
 uniform sampler2D vTexture;
+//默认传递过来的是0
 uniform int vChangeType;
+//默认传递过来的是[0,0,0]
 uniform vec3 vChangeColor;
+//默认传递过来的是0
 uniform int vIsHalf;
+//默认传递过来的是屏幕宽高比
 uniform float uXY;
 
+//传递过来的是变换后的顶点
 varying vec4 gPosition;
-
+//传递过来的是纹理坐标
 varying vec2 aCoordinate;
+//传递过来的是原始顶点
 varying vec4 aPos;
 
 void modifyColor(vec4 color){

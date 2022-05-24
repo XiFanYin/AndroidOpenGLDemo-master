@@ -19,19 +19,26 @@ import edu.wuwang.opengl.image.filter.ColorFilter;
 import edu.wuwang.opengl.image.filter.ContrastColorFilter;
 
 /**
- * Description:
+ * Description:这里是包装者模式，真正的渲染是ContrastColorFilter去实现的
  */
 public class SGLRender implements GLSurfaceView.Renderer {
 
+    //真正的渲染器
     private AFilter mFilter;
+    //纹理bitmap
     private Bitmap bitmap;
+    //View的宽高
     private int width,height;
     private boolean refreshFlag=false;
+    //记录open配置
     private EGLConfig config;
 
+    //构造方法
     public SGLRender(View mView){
+        //真正的渲染器，传递上下文和渲染类型，创建默认渲染器
         mFilter=new ContrastColorFilter(mView.getContext(), ColorFilter.Filter.NONE);
     }
+
 
     public void setFilter(AFilter filter){
         refreshFlag=true;
@@ -54,21 +61,28 @@ public class SGLRender implements GLSurfaceView.Renderer {
         return mFilter;
     }
 
+
+
+    //设置纹理图片
     public void setImage(Bitmap bitmap){
         this.bitmap=bitmap;
+        //把纹理图片传递给真正的渲染器
         mFilter.setBitmap(bitmap);
     }
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         this.config=config;
+        //调用真正的渲染
         mFilter.onSurfaceCreated(gl, config);
     }
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
+        //获取控件宽高
         this.width=width;
         this.height=height;
+        //调用真正渲染
         mFilter.onSurfaceChanged(gl, width, height);
     }
 
@@ -79,6 +93,7 @@ public class SGLRender implements GLSurfaceView.Renderer {
             mFilter.onSurfaceChanged(gl,width,height);
             refreshFlag=false;
         }
+        //调用真正渲染
         mFilter.onDrawFrame(gl);
     }
 }

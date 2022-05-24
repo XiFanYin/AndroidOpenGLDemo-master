@@ -12,6 +12,7 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
 import android.opengl.Matrix;
+import android.util.Log;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -23,7 +24,7 @@ import javax.microedition.khronos.opengles.GL10;
 import edu.wuwang.opengl.utils.ShaderUtils;
 
 /**
- * Description:
+ * Description: 真正的渲染base类
  */
 public abstract class AFilter implements GLSurfaceView.Renderer {
 
@@ -45,19 +46,22 @@ public abstract class AFilter implements GLSurfaceView.Renderer {
 
     private float uXY;
 
+    //定点和片段代码位置路径字符串
     private String vertex;
     private String fragment;
+    //变换矩阵
     private float[] mViewMatrix=new float[16];
     private float[] mProjectMatrix=new float[16];
     private float[] mMVPMatrix=new float[16];
 
+    //定点坐标
     private final float[] sPos={
             -1.0f,1.0f,
             -1.0f,-1.0f,
             1.0f,1.0f,
             1.0f,-1.0f
     };
-
+    //纹理坐标
     private final float[] sCoord={
             0.0f,0.0f,
             0.0f,1.0f,
@@ -69,17 +73,24 @@ public abstract class AFilter implements GLSurfaceView.Renderer {
         this.mContext=context;
         this.vertex=vertex;
         this.fragment=fragment;
+        //写入本地顶点坐标
         ByteBuffer bb=ByteBuffer.allocateDirect(sPos.length*4);
         bb.order(ByteOrder.nativeOrder());
         bPos=bb.asFloatBuffer();
         bPos.put(sPos);
         bPos.position(0);
+        //写入本地纹理
         ByteBuffer cc=ByteBuffer.allocateDirect(sCoord.length*4);
         cc.order(ByteOrder.nativeOrder());
         bCoord=cc.asFloatBuffer();
         bCoord.put(sCoord);
         bCoord.position(0);
     }
+    //传递纹理资源图片
+    public void setBitmap(Bitmap bitmap){
+        this.mBitmap=bitmap;
+    }
+
 
     public void setHalf(boolean half){
         this.isHalf=half;
@@ -89,21 +100,26 @@ public abstract class AFilter implements GLSurfaceView.Renderer {
         mBitmap= Bitmap.createBitmap(buffer,width,height, Bitmap.Config.RGB_565);
     }
 
-    public void setBitmap(Bitmap bitmap){
-        this.mBitmap=bitmap;
-    }
+
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+        //设置背景图片颜色
         GLES20.glClearColor(1.0f,1.0f,1.0f,1.0f);
+        //开启2D纹理渲染，默认纹理是关闭状态
         GLES20.glEnable(GLES20.GL_TEXTURE_2D);
+        //获取着色器程序
         mProgram=ShaderUtils.createProgram(mContext.getResources(),vertex,fragment);
+        //获取定点位置
         glHPosition=GLES20.glGetAttribLocation(mProgram,"vPosition");
+        //获取纹理位置
         glHCoordinate=GLES20.glGetAttribLocation(mProgram,"vCoordinate");
+        //获取纹理对象位置
         glHTexture=GLES20.glGetUniformLocation(mProgram,"vTexture");
         glHMatrix=GLES20.glGetUniformLocation(mProgram,"vMatrix");
         hIsHalf=GLES20.glGetUniformLocation(mProgram,"vIsHalf");
         glHUxy=GLES20.glGetUniformLocation(mProgram,"uXY");
+        //提供给子类呗调用的方式
         onDrawCreatedSet(mProgram);
     }
 
@@ -137,30 +153,45 @@ public abstract class AFilter implements GLSurfaceView.Renderer {
 
     @Override
     public void onDrawFrame(GL10 gl) {
+        //清空颜色，使用之前配置好的颜色
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT|GLES20.GL_DEPTH_BUFFER_BIT);
+        //使用应用程序
         GLES20.glUseProgram(mProgram);
+        //提供子类被调用的方式
         onDrawSet();
+        //传递参数，默认是0
         GLES20.glUniform1i(hIsHalf,isHalf?1:0);
+        //传递控件宽高比
         GLES20.glUniform1f(glHUxy,uXY);
+        //传递变换矩阵
         GLES20.glUniformMatrix4fv(glHMatrix,1,false,mMVPMatrix,0);
+        //开启定点数据
         GLES20.glEnableVertexAttribArray(glHPosition);
         GLES20.glEnableVertexAttribArray(glHCoordinate);
+        //
         GLES20.glUniform1i(glHTexture, 0);
+        //创建纹理
         textureId=createTexture();
+        //传入数据，
         GLES20.glVertexAttribPointer(glHPosition,2,GLES20.GL_FLOAT,false,0,bPos);
         GLES20.glVertexAttribPointer(glHCoordinate,2,GLES20.GL_FLOAT,false,0,bCoord);
+        //绘制矩形，按照abc bcd的方式绘制
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP,0,4);
     }
 
-    public abstract void onDrawSet();
-    public abstract void onDrawCreatedSet(int mProgram);
 
+    //创建纹理函数
     private int createTexture(){
         int[] texture=new int[1];
         if(mBitmap!=null&&!mBitmap.isRecycled()){
-            //生成纹理
+            //创建一个纹理索引
+            /**
+             * 参数一：纹理数量
+             * 参数二：纹理储存位置
+             * 参数三：偏移量
+             */
             GLES20.glGenTextures(1,texture,0);
-            //生成纹理
+            //需要绑定它，让之后任何的纹理指令都可以配置当前绑定的纹理
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,texture[0]);
             //设置缩小过滤为使用纹理中坐标最接近的一个像素的颜色作为需要绘制的像素颜色
             GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER,GLES20.GL_NEAREST);
@@ -177,5 +208,7 @@ public abstract class AFilter implements GLSurfaceView.Renderer {
         return 0;
     }
 
+    public abstract void onDrawSet();
+    public abstract void onDrawCreatedSet(int mProgram);
 
 }
