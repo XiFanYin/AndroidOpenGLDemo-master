@@ -33,28 +33,39 @@ public class KitkatCamera implements ICamera {
     private Point mPreSize;
 
     public KitkatCamera(){
+        //创建宽高比bean
         this.mConfig=new Config();
+        //设置预览宽度
         mConfig.minPreviewWidth=720;
+        //设置照片宽度
         mConfig.minPictureWidth=720;
+        //设置宽高比
         mConfig.rate=1.778f;
+        //创建大小排序
         sizeComparator=new CameraSizeComparator();
     }
 
     @Override
     public boolean open(int cameraId) {
+        //打开相机
         mCamera=Camera.open(cameraId);
-
+        //如果能打开相机
         if(mCamera!=null){
+            //获取相机参数配置对象
             Camera.Parameters param=mCamera.getParameters();
+            //获取最优相片宽高比
             picSize=getPropPictureSize(param.getSupportedPictureSizes(),mConfig.rate,
                 mConfig.minPictureWidth);
+            //获取最优预览宽高比
             preSize=getPropPreviewSize(param.getSupportedPreviewSizes(),mConfig.rate,mConfig
                 .minPreviewWidth);
             param.setPictureSize(picSize.width,picSize.height);
             param.setPreviewSize(preSize.width,preSize.height);
+            //设置参数
             mCamera.setParameters(param);
             Camera.Size pre=param.getPreviewSize();
             Camera.Size pic=param.getPictureSize();
+            //创建图片和预览的宽高
             mPicSize=new Point(pic.height,pic.width);
             mPreSize=new Point(pre.height,pre.width);
             Log.e("wuwang","camera previewSize:"+mPreSize.x+"/"+mPreSize.y);
@@ -78,6 +89,7 @@ public class KitkatCamera implements ICamera {
         this.mConfig=config;
     }
 
+    //开启预览
     @Override
     public boolean preview() {
         if(mCamera!=null){

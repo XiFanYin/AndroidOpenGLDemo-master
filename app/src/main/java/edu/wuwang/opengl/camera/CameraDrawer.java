@@ -44,12 +44,13 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
     public CameraDrawer(Resources res){
         mOesFilter=new OesFilter(res);
     }
+    //设置预览的宽高
     public void setDataSize(int dataWidth,int dataHeight){
         this.dataWidth=dataWidth;
         this.dataHeight=dataHeight;
         calculateMatrix();
     }
-
+    //设置控件的宽高
     public void setViewSize(int width,int height){
         this.width=width;
         this.height=height;
@@ -78,6 +79,7 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+        //创建一个纹理
         int texture = createTextureID();
         surfaceTexture=new SurfaceTexture(texture);
         mOesFilter.create();
@@ -91,9 +93,11 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
 
     @Override
     public void onDrawFrame(GL10 gl) {
+        //更新图片
         if(surfaceTexture!=null){
             surfaceTexture.updateTexImage();
         }
+        //调用绘制
         mOesFilter.draw();
     }
 

@@ -28,41 +28,56 @@ public class CameraView extends GLSurfaceView implements GLSurfaceView.Renderer 
     private int cameraId=0;
     private Runnable mRunnable;
 
+    //构造函数
     public CameraView(Context context) {
         this(context,null);
     }
-
+    //构造函数
     public CameraView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
     }
 
     private void init(){
+        //设置版本
         setEGLContextClientVersion(2);
+        //设置渲染器
         setRenderer(this);
+        //设置渲染模式手动模式
         setRenderMode(RENDERMODE_WHEN_DIRTY);
+        //创建相机工具类
         mCamera2=new KitkatCamera();
+        //创建相机渲染类
         mCameraDrawer=new CameraDrawer(getResources());
     }
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+        //调用真正的渲染
         mCameraDrawer.onSurfaceCreated(gl,config);
+        //
         if(mRunnable!=null){
             mRunnable.run();
             mRunnable=null;
         }
+        //打开相机
         mCamera2.open(cameraId);
+        //传递前置摄像头和后置摄像头标识
         mCameraDrawer.setCameraId(cameraId);
+        //获取预览大小
         Point point=mCamera2.getPreviewSize();
+        //设置预览大小
         mCameraDrawer.setDataSize(point.x,point.y);
+        //获取渲染的位置，和相机绑定
         mCamera2.setPreviewTexture(mCameraDrawer.getSurfaceTexture());
+        //手动调用刷新
         mCameraDrawer.getSurfaceTexture().setOnFrameAvailableListener(new SurfaceTexture.OnFrameAvailableListener() {
             @Override
             public void onFrameAvailable(SurfaceTexture surfaceTexture) {
                 requestRender();
             }
         });
+        //开启预览
         mCamera2.preview();
     }
 

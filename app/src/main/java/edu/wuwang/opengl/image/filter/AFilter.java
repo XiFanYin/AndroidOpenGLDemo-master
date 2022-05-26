@@ -168,7 +168,7 @@ public abstract class AFilter implements GLSurfaceView.Renderer {
         //开启定点数据
         GLES20.glEnableVertexAttribArray(glHPosition);
         GLES20.glEnableVertexAttribArray(glHCoordinate);
-        //
+        //OpenGL默认激活的就是第一个纹理单元，第二个参数索引需要和纹理单元索引保持一致
         GLES20.glUniform1i(glHTexture, 0);
         //创建纹理
         textureId=createTexture();
