@@ -168,7 +168,7 @@ public abstract class AFilter implements GLSurfaceView.Renderer {
         //开启定点数据
         GLES20.glEnableVertexAttribArray(glHPosition);
         GLES20.glEnableVertexAttribArray(glHCoordinate);
-        //OpenGL默认激活的就是第一个纹理单元，第二个参数索引需要和纹理单元索引保持一致
+        //OpenGL默认激活的就是第一个纹理单元，第二个参数索引需要和纹理单元索引保持一致，把纹理单元传递到着色器上去
         GLES20.glUniform1i(glHTexture, 0);
         //创建纹理
         textureId=createTexture();
@@ -182,6 +182,7 @@ public abstract class AFilter implements GLSurfaceView.Renderer {
 
     //创建纹理函数
     private int createTexture(){
+        //可以储存多个纹理，因为我们这里只使用一个纹理，所以数组长度是1
         int[] texture=new int[1];
         if(mBitmap!=null&&!mBitmap.isRecycled()){
             //创建一个纹理索引
