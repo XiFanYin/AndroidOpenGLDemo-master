@@ -68,9 +68,9 @@ public class CameraView extends GLSurfaceView implements GLSurfaceView.Renderer 
         Point point=mCamera2.getPreviewSize();
         //设置预览大小
         mCameraDrawer.setDataSize(point.x,point.y);
-        //获取渲染的位置，和相机绑定
+        //设置预览
         mCamera2.setPreviewTexture(mCameraDrawer.getSurfaceTexture());
-        //手动调用刷新
+        //此处调用渲染，会触发onDrawFrame执行
         mCameraDrawer.getSurfaceTexture().setOnFrameAvailableListener(new SurfaceTexture.OnFrameAvailableListener() {
             @Override
             public void onFrameAvailable(SurfaceTexture surfaceTexture) {

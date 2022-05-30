@@ -15,6 +15,7 @@ import java.nio.ShortBuffer;
 import java.util.Arrays;
 
 import android.content.res.Resources;
+import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.util.Log;
 import android.util.SparseArray;
@@ -81,6 +82,7 @@ public abstract class AFilter {
     private float[] matrix= Arrays.copyOf(OM,16);
 
     private int textureType=0;      //默认使用Texture2D0
+    //创建的纹理id
     private int textureId=0;
     //顶点坐标
     private float pos[] = {
@@ -102,11 +104,13 @@ public abstract class AFilter {
     private SparseArray<int[]> mInts;
     private SparseArray<float[]> mFloats;
 
+    //构造方法
     public AFilter(Resources mRes){
         this.mRes=mRes;
         initBuffer();
     }
 
+    //子类onSurfaceCreated中调用
     public final void create(){
         onCreate();
     }
@@ -115,20 +119,38 @@ public abstract class AFilter {
         onSizeChanged(width,height);
     }
 
+    //调用真正的绘制
     public void draw(){
+        //清空背景
         onClear();
+        //使用程序
         onUseProgram();
+        //设置变换矩阵，调用子类,子类又调用父类
         onSetExpandData();
+        //完全调用子类
         onBindTexture();
+        //绘制
         onDraw();
     }
 
+    //设置变换矩阵
     public void setMatrix(float[] matrix){
         this.matrix=matrix;
     }
 
+    //获取变换矩阵
     public float[] getMatrix(){
         return matrix;
+    }
+
+    //设置纹理id
+    public final int getTextureId(){
+        return textureId;
+    }
+
+    //获取纹理ID
+    public final void setTextureId(int textureId){
+        this.textureId=textureId;
     }
 
     public final void setTextureType(int type){
@@ -139,14 +161,6 @@ public abstract class AFilter {
         return textureType;
     }
 
-    public final int getTextureId(){
-        return textureId;
-    }
-
-    public final void setTextureId(int textureId){
-        this.textureId=textureId;
-    }
-
     public void setFlag(int flag){
         this.mFlag=flag;
     }
@@ -154,6 +168,9 @@ public abstract class AFilter {
     public int getFlag(){
         return mFlag;
     }
+
+
+
 
     public void setFloat(int type,float ... params){
         if(mFloats==null){
@@ -208,14 +225,19 @@ public abstract class AFilter {
     protected abstract void onCreate();
     protected abstract void onSizeChanged(int width,int height);
 
+
+
     protected final void createProgram(String vertex,String fragment){
+        //创建编译程序
         mProgram= uCreateGlProgram(vertex,fragment);
+        //获取索引
         mHPosition= GLES20.glGetAttribLocation(mProgram, "vPosition");
         mHCoord=GLES20.glGetAttribLocation(mProgram,"vCoord");
         mHMatrix=GLES20.glGetUniformLocation(mProgram,"vMatrix");
         mHTexture=GLES20.glGetUniformLocation(mProgram,"vTexture");
     }
 
+    //从文件中加载着色器
     protected final void createProgramByAssetsFile(String vertex,String fragment){
         createProgram(uRes(mRes,vertex),uRes(mRes,fragment));
     }
@@ -224,6 +246,7 @@ public abstract class AFilter {
      * Buffer初始化
      */
     protected void initBuffer(){
+        //定点数据复制到本地内存
         ByteBuffer a=ByteBuffer.allocateDirect(32);
         a.order(ByteOrder.nativeOrder());
         mVerBuffer=a.asFloatBuffer();
@@ -236,6 +259,7 @@ public abstract class AFilter {
         mTexBuffer.position(0);
     }
 
+    //使用程序
     protected void onUseProgram(){
         GLES20.glUseProgram(mProgram);
     }
@@ -244,11 +268,17 @@ public abstract class AFilter {
      * 启用顶点坐标和纹理坐标进行绘制
      */
     protected void onDraw(){
+        //激活顶点索引
         GLES20.glEnableVertexAttribArray(mHPosition);
+        //传递数据
         GLES20.glVertexAttribPointer(mHPosition,2, GLES20.GL_FLOAT, false, 0,mVerBuffer);
+        //激活纹理索引
         GLES20.glEnableVertexAttribArray(mHCoord);
+        //传递数据
         GLES20.glVertexAttribPointer(mHCoord, 2, GLES20.GL_FLOAT, false, 0, mTexBuffer);
+        //绘制巨型
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP,0,4);
+        //释放索引
         GLES20.glDisableVertexAttribArray(mHPosition);
         GLES20.glDisableVertexAttribArray(mHCoord);
     }
@@ -257,21 +287,22 @@ public abstract class AFilter {
      * 清除画布
      */
     protected void onClear(){
+        //清空画布，设置颜色
         GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
     }
 
     /**
-     * 设置其他扩展数据
-     */
+     * 把子类传递过来的变换矩阵传递到着色器，在子类中触发*/
     protected void onSetExpandData(){
         GLES20.glUniformMatrix4fv(mHMatrix,1,false,matrix,0);
     }
 
     /**
-     * 绑定默认纹理
+     * 绑定默认纹理，子类覆盖父类实现
      */
     protected void onBindTexture(){
+        //激活纹理
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0+textureType);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,getTextureId());
         GLES20.glUniform1i(mHTexture,textureType);

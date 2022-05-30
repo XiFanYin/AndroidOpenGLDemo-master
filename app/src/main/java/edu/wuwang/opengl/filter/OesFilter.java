@@ -21,15 +21,19 @@ public class OesFilter extends AFilter{
     private int mHCoordMatrix;
     private float[] mCoordMatrix= Arrays.copyOf(OM,16);
 
+    //构造方法
     public OesFilter(Resources mRes) {
         super(mRes);
     }
 
     @Override
     protected void onCreate() {
+        //加载着色器
         createProgramByAssetsFile("shader/oes_base_vertex.sh","shader/oes_base_fragment.sh");
+        //获取效果
         mHCoordMatrix=GLES20.glGetUniformLocation(mProgram,"vCoordMatrix");
     }
+
 
     public void setCoordMatrix(float[] matrix){
         this.mCoordMatrix=matrix;
@@ -37,14 +41,18 @@ public class OesFilter extends AFilter{
 
     @Override
     protected void onSetExpandData() {
+        //调用父类设置矩阵
         super.onSetExpandData();
         GLES20.glUniformMatrix4fv(mHCoordMatrix,1,false,mCoordMatrix,0);
     }
 
     @Override
     protected void onBindTexture() {
+        //激活纹理。0
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0+getTextureType());
+        //绑定传递过去的Texttrueid
         GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES,getTextureId());
+        //传递纹理为0
         GLES20.glUniform1i(mHTexture,getTextureType());
     }
 

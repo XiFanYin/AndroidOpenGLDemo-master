@@ -35,9 +35,9 @@ public class KitkatCamera implements ICamera {
     public KitkatCamera(){
         //创建宽高比bean
         this.mConfig=new Config();
-        //设置预览宽度
+        //设置预览最小宽度
         mConfig.minPreviewWidth=720;
-        //设置照片宽度
+        //设置照片最小宽度
         mConfig.minPictureWidth=720;
         //设置宽高比
         mConfig.rate=1.778f;
@@ -74,6 +74,7 @@ public class KitkatCamera implements ICamera {
         return false;
     }
 
+    //相机预览需要一个SurfaceTexture，就把自己创建的SurfaceTexture传递过来，设置进去
     public void setPreviewTexture(SurfaceTexture texture){
         if(mCamera!=null){
             try {
